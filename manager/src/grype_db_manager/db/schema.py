@@ -47,6 +47,8 @@ class SchemaMapping:
 
 
 def register_mapping(file: str) -> None:
+    if ".." in file:
+        raise Exception("Invalid file path")
     with open(file) as f:
         global _mapping_file_content  # noqa: PLW0603
         _mapping_file_content = f.read()
