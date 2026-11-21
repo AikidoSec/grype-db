@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/google/shlex"
@@ -75,10 +76,19 @@ func run(ctx context.Context, cmd, dir, name string, env map[string]string) erro
 	if len(parsedArgs) == 0 {
 		return fmt.Errorf("no command specified")
 	}
+	validInput := regexp.MustCompile(`^[a-zA-Z0-9_\-\./\\]+$`)
 	cmdStr := parsedArgs[0]
+	if !validInput.MatchString(cmdStr) {
+		return fmt.Errorf("invalid input")
+	}
 	var args []string
 	if len(parsedArgs) > 1 {
 		args = parsedArgs[1:]
+	}
+	for _, arg := range args {
+		if !validInput.MatchString(arg) {
+			return fmt.Errorf("invalid input")
+		}
 	}
 	cmdObj := exec.CommandContext(ctx, cmdStr, args...)
 	cmdObj.Dir = dir
