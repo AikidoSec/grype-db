@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 var _ Entry = (*FileEntry)(nil)
@@ -27,6 +29,11 @@ func NewEntryFromFilePaths(paths ...string) []Entry {
 }
 
 func (t FileEntry) writeEntry(tw lowLevelWriter) error {
+	for _, seg := range strings.Split(filepath.ToSlash(t.Path), "/") {
+		if seg == ".." {
+			return fmt.Errorf("invalid file path")
+		}
+	}
 	fi, err := os.Lstat(t.Path)
 	if err != nil {
 		return fmt.Errorf("unable to stat file %q: %w", t.Path, err)
