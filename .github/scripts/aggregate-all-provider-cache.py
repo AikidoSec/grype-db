@@ -2,6 +2,7 @@
 import argparse
 import os
 import ast
+import re
 import sys
 import subprocess
 import threading
@@ -29,6 +30,9 @@ def get_providers():
 
 def download_provider(provider: str, status: dict, lock: threading.Lock, verbose: bool) -> tuple[str, bool, str]:
     """Download and restore a single provider's cache. Returns (provider, success, message)."""
+    if not re.match(r'^[a-zA-Z0-9_\-./\\]+$', provider):
+        raise ValueError(f"Invalid provider name: {provider}")
+    
     with lock:
         status[provider] = "downloading"
 
